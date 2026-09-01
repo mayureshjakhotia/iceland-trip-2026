@@ -1,0 +1,96 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Iceland · Sep 2–12</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<style>
+:root{--bg:#0f1115;--card:#181b22;--line:#262b36;--tx:#e8eaed;--dim:#9aa3b2;--ok:#3fb950;--warn:#d29922;--no:#f85149;--acc:#58a6ff}
+*{box-sizing:border-box;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif}
+header{padding:18px 16px 12px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(15,17,21,.96);backdrop-filter:blur(12px);z-index:900}
+h1{margin:0;font-size:19px;letter-spacing:-.3px}
+.meta{color:var(--dim);font-size:12.5px;margin-top:5px}
+.meta b{color:var(--tx);font-weight:600}
+.tabs{display:flex;gap:6px;margin-top:12px}
+.tab{flex:1;padding:9px;text-align:center;border:1px solid var(--line);border-radius:9px;font-size:13.5px;font-weight:600;color:var(--dim);cursor:pointer;user-select:none}
+.tab.on{background:var(--acc);border-color:var(--acc);color:#08111f}
+#map{height:62vh;display:none}
+.wrap{padding:12px 12px 60px}
+.alert{background:#3d1e1e;border:1px solid #7d2b2b;border-radius:11px;padding:13px 14px;margin-bottom:14px;font-size:14px;line-height:1.55}
+.alert b{color:#ffb4ab}
+.day{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;overflow:hidden}
+.dh{padding:13px 14px;display:flex;align-items:center;gap:10px;cursor:pointer}
+.num{width:29px;height:29px;flex:0 0 29px;border-radius:8px;background:#222834;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--acc)}
+.dt{flex:1;min-width:0}
+.dt .d1{font-size:15px;font-weight:650}
+.dt .d2{font-size:12px;color:var(--dim);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.wx{font-size:11px;color:var(--dim);text-align:right;flex:0 0 auto;line-height:1.35}
+.wx .bad{color:var(--no);font-weight:700}
+.wx .cold{color:var(--acc);font-weight:700}
+.body{display:none;padding:0 14px 14px;border-top:1px solid var(--line)}
+.day.open .body{display:block}
+.sec{font-size:10.5px;letter-spacing:.9px;text-transform:uppercase;color:var(--dim);margin:14px 0 7px;font-weight:700}
+.row{display:flex;gap:10px;padding:6px 0;font-size:14px;border-bottom:1px solid #1e222b}
+.row:last-child{border:0}
+.tm{flex:0 0 46px;color:var(--acc);font-weight:650;font-size:13px}
+.drv{font-size:12.5px;color:var(--dim);background:#12151b;border-radius:8px;padding:8px 10px;margin-top:10px}
+.st{display:flex;gap:9px;padding:8px 0;font-size:13.5px;align-items:flex-start;border-bottom:1px solid #1e222b}
+.st:last-child{border:0}
+.pill{flex:0 0 auto;font-size:10px;font-weight:800;padding:3px 7px;border-radius:6px;letter-spacing:.4px;margin-top:1px}
+.p-yes{background:#12331c;color:var(--ok)} .p-no{background:#3d1a1a;color:var(--no)}
+.p-window{background:#3a2d0c;color:var(--warn)} .p-caution{background:#3a2d0c;color:var(--warn)} .p-unclear{background:#2b2f3a;color:var(--dim)}
+.sn{font-weight:600} .sd{color:var(--dim);font-size:12.5px;margin-top:2px;line-height:1.45}
+a{color:var(--acc)}
+.foot{color:var(--dim);font-size:11.5px;text-align:center;padding:18px 10px;line-height:1.6}
+</style></head><body>
+<header>
+<h1>Iceland · Sep 2–12</h1>
+<div class="meta">Kia Sportage AWD · 11 days · 10 nights</div>
+<div class="tabs"><div class="tab on" id="tD">Days</div><div class="tab" id="tM">Map</div></div>
+</header>
+<div id="map"></div>
+<div class="wrap" id="list"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="data.js"></script>
+<script>
+const LBL={yes:"FLY OK",no:"NO FLY",window:"TIME ONLY",caution:"CAUTION",unclear:"UNCLEAR"};
+let html=`<div class="alert"><b>⚠ Sep 2–3 forecast: 100% rain, 54–55 km/h wind.</b> Your two shoot days on the south coast are the worst weather of the trip. Seljalandsfoss and Reynisfjara in 55 km/h wind means horizontal spray — protect the camera, and consider swapping the DC-3 wreck to a calmer day. Everything from Sep 4 east is calm (8–10 km/h).</div>`;
+TRIP.days.forEach(d=>{
+ const w=d.wx, bad=d.storm?'bad':(d.freeze||d.cold?'cold':'');
+ html+=`<div class="day" onclick="this.classList.toggle('open')">
+ <div class="dh"><div class="num">${d.n}</div>
+  <div class="dt"><div class="d1">${d.date} · ${d.base}</div><div class="d2">${d.drive}</div></div>
+  <div class="wx"><div class="${bad}">${w.t}</div><div class="${d.storm?'bad':''}">${w.rain} · ${w.wind}</div></div></div>
+ <div class="body">
+  <div class="sec">Plan</div>
+  ${d.plan.map(p=>`<div class="row"><div class="tm">${p[0]}</div><div>${p[1]}</div></div>`).join('')}
+  <div class="drv">🚗 ${d.drive}</div>
+  <div class="sec">Drone — Mavic Mini (249 g)</div>
+  ${d.stops.map(s=>`<div class="st"><span class="pill p-${s.d}">${LBL[s.d]}</span><div><div class="sn">${s.n}</div><div class="sd">${s.dn}</div></div></div>`).join('')}
+ </div></div>`;});
+html+=`<div class="foot">Drive times are live OSRM. Weather is Open-Meteo, fetched 1 Sep — recheck on the day.<br>
+Drone rules verified against Samgöngustofa, Náttúruverndarstofnun (17 May 2026 list), Vatnajökull NP and Þingvellir NP.<br>
+<b>Register the drone first: flydrone.is, 5,863 ISK, no exam needed under 250 g.</b><br>
+Check <a href="https://kort.gis.is/mapview/?app=dronar">kort.gis.is</a> before every flight, and read the car-park signage.</div>`;
+document.getElementById('list').innerHTML=html;
+
+let map=null;
+const C={yes:'#3fb950',no:'#f85149',window:'#d29922',caution:'#d29922',unclear:'#8b949e'};
+document.getElementById('tM').onclick=()=>{
+ document.getElementById('tM').classList.add('on');document.getElementById('tD').classList.remove('on');
+ document.getElementById('map').style.display='block';document.getElementById('list').style.display='none';
+ if(!map){
+  map=L.map('map').setView([64.9,-18.5],6);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{attribution:'© OSM © CARTO',maxZoom:18}).addTo(map);
+  const pts=[];
+  TRIP.days.forEach(d=>d.stops.forEach(s=>{
+   pts.push([s.la,s.lo]);
+   L.circleMarker([s.la,s.lo],{radius:7,color:C[s.d],fillColor:C[s.d],fillOpacity:.85,weight:2})
+    .bindPopup(`<b>Day ${d.n} — ${s.n}</b><br><span style="color:${C[s.d]}">${LBL[s.d]}</span><br>${s.dn}`).addTo(map);
+  }));
+  L.polyline(pts,{color:'#58a6ff',weight:2.5,opacity:.55}).addTo(map);
+  map.fitBounds(pts,{padding:[28,28]});
+ } setTimeout(()=>map.invalidateSize(),60);};
+document.getElementById('tD').onclick=()=>{
+ document.getElementById('tD').classList.add('on');document.getElementById('tM').classList.remove('on');
+ document.getElementById('map').style.display='none';document.getElementById('list').style.display='block';};
+</script></body></html>
