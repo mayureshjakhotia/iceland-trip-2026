@@ -51,10 +51,10 @@ a{color:var(--acc)}
 <div id="map"></div>
 <div class="wrap"><a href="sep3-east.html" style="display:flex;min-height:48px;align-items:center;justify-content:center;margin-bottom:12px;padding:11px 13px;border-radius:11px;background:#58a6ff;color:#08111f;text-decoration:none;font-size:14px;font-weight:750;text-align:center">TODAY · Open Sep 3 east-coast driving guide</a><div id="list"></div></div>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="data.js?v=20260903-east"></script>
+<script src="data.js?v=20260903-sunset"></script>
 <script>
 const LBL={yes:"FLY OK",no:"NO FLY",window:"TIME ONLY",caution:"CAUTION",unclear:"UNCLEAR"};
-let html=`<div class="alert today"><b>Sep 3 live override:</b> today is the far-east run to Jökulsárlón, Diamond Beach and Stokksnes—not the old local Vík loop. Use the blue guide above for the verified route, service stops and live-safety links. Reflow the later day cards after tonight's stay is confirmed.</div>`;
+let html=`<div class="alert today"><b>Sep 3 live override:</b> today is the far-east run to Jökulsárlón and Diamond Beach, then hotel check-in before optional Stokksnes—not the old local Vík loop. Use the blue guide above for the verified route, sunset cutoffs, service stops and live-safety links.</div>`;
 TRIP.days.forEach(d=>{
  const w=d.wx, bad=d.storm?'bad':(d.freeze||d.cold?'cold':'');
  html+=`<div class="day" onclick="this.classList.toggle('open')">
